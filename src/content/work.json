@@ -1,9 +1,37 @@
 [
 	{
 		"id": 1,
-		"duration": "2024 - present",
-		"company": "Astro Community",
-		"title": "Astro Theme",
-		"description": "Existing as an Astro theme for anyone to use."
+		"duration": "Mar 2022 – Aug 2022",
+		"company": "Olive Intelligence Management",
+		"title": "Jr. Software Developer",
+		"description": "Built a room booking system and PDF generation features using Laravel. First professional role — full-stack across the whole SDLC."
+	},
+	{
+		"id": 2,
+		"duration": "Feb 2024 – Mar 2024",
+		"company": "Olive Intelligence Management",
+		"title": "Software Developer (Contract)",
+		"description": "Returned to build a permission request system with PDF generation in Laravel. Contract engagement during my degree."
+	},
+	{
+		"id": 3,
+		"duration": "Aug 2024",
+		"company": "Pakar Scieno TW Sdn Bhd",
+		"title": "Programmer (Volunteer)",
+		"description": "Built a CCTV live streaming module using ASP.NET and Frigate NVR, then refactored the frontend to Vue.js."
+	},
+	{
+		"id": 4,
+		"duration": "Feb 2025 – Mar 2025",
+		"company": "Pakar Scieno TW Sdn Bhd",
+		"title": "Software Engineer (Contract)",
+		"description": "Developed an Inventory Management System module using ASP.NET Core MVC + Entity Framework. Improved inventory management efficiency by 40%."
+	},
+	{
+		"id": 5,
+		"duration": "Aug 2025 – Feb 2026",
+		"company": "Mimos Services Sdn Bhd",
+		"title": "IT Intern",
+		"description": "Led project architecture and built N8N automation pipelines. Handled GCP and Firebase deployment with Docker and Ngrok."
 	}
 ]

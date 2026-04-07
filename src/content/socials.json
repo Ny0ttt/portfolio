@@ -2,10 +2,28 @@
 	{
 		"id": 1,
 		"icon": {
-			"type": "lucide",
+			"type": "simple-icons",
 			"name": "github"
 		},
-		"text": "GitHub",
-		"link": "https://github.com/louisescher/spectre"
+		"text": "Ny0ttt",
+		"link": "https://github.com/Ny0ttt"
+	},
+	{
+		"id": 2,
+		"icon": {
+			"type": "lucide",
+			"name": "mail"
+		},
+		"text": "rasyidbinhamidun@gmail.com",
+		"link": "mailto:rasyidbinhamidun@gmail.com"
+	},
+	{
+		"id": 3,
+		"icon": {
+			"type": "simple-icons",
+			"name": "whatsapp"
+		},
+		"text": "+60 19-389 0301",
+		"link": "https://wa.me/60193890301"
 	}
 ]

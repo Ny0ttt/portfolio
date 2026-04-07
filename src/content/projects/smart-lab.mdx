@@ -1,0 +1,88 @@
+---
+title: Smart Lab Facility Operation Portal
+description: Microservice portal integrating door access, CCTV with AI object detection, and a custom computer access system for a university research lab.
+date: 03-01-2025
+image: ../assets/spectre.png
+info:
+  - text: ".NET Core · MySQL · Docker · Frigate NVR · Gemini API · Ollama"
+    icon:
+      type: lucide
+      name: layers
+  - text: "95% UAT Pass Rate"
+    icon:
+      type: lucide
+      name: check-circle
+  - text: "Final Year Project — MJIIT, UTM"
+    icon:
+      type: lucide
+      name: graduation-cap
+  - text: "Microservice Architecture"
+    icon:
+      type: lucide
+      name: network
+---
+
+## The Problem
+
+The SEiR research lab at MJIIT had no centralized facility management. Door access existed, but there was no PC usage tracking, no CCTV integration, and no unified view of who was using what.
+
+## The Solution
+
+A microservice portal that ties together three systems: door access control (ZKBio CVSecurity), CCTV with AI object detection (Frigate+), and a custom-built Windows Forms computer access module.
+
+## My Role
+
+Built the computer access software, the AI object detection layer, and the RESTful APIs connecting everything. Responsible for the full SDLC — requirements gathering, UI/UX, coding, and testing. Used an Agile approach to accommodate stakeholder feedback throughout.
+
+## Timeline
+
+| Milestone | Date |
+|---|---|
+| Requirements gathering | Oct 2024 |
+| Prototype & architecture | Nov 2024 |
+| Core development | Dec 2024 – Feb 2025 |
+| UAT & stakeholder review | Mar 2025 |
+| Completed | Mar 2025 |
+
+## Stack
+
+- **Backend**: .NET Core, RESTful APIs
+- **Database**: MySQL
+- **Infrastructure**: Docker Compose
+- **CCTV / AI**: Frigate NVR, Gemini API, Ollama (Mistral — runs locally)
+- **Architecture**: Microservice
+
+## Results
+
+- 95% UAT pass rate
+- All requirements met and stakeholder-approved
+- Demonstrated live integration of AI object detection in a real lab environment
+
+## Key Challenges
+
+- Integrating three independently-designed systems (ZKBio, Frigate, and the custom Windows Forms app) into one coherent portal without modifying the existing door access infrastructure
+- Running AI object detection locally with Ollama/Mistral to avoid cloud dependency — required tuning inference performance within lab hardware constraints
+- Agile stakeholder management across academic and technical audiences with differing expectations
+
+## Demo Video
+
+<iframe
+  src="https://www.youtube.com/embed/TzVnfTMmNVk"
+  title="Smart Lab Facility Operation Portal — Demo"
+  width="100%"
+  style="aspect-ratio: 16/9; border: none;"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowfullscreen
+></iframe>
+
+## Screenshots
+
+> Coming soon — UI screenshots will be added here.
+
+## Architecture Diagram
+
+> Coming soon — system architecture diagram will be added here.
+
+## GitHub
+
+> Coming soon — repository link will be added once made public.

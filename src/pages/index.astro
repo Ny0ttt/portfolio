@@ -1,7 +1,7 @@
 ---
 import "../styles/index.css";
 
-import { getCollection, getEntry, render } from "astro:content";
+import { getCollection } from "astro:content";
 import { name, openGraph } from "spectre:globals";
 import ProfilePicture from "../assets/pfp.png";
 import Card from "../components/Card.astro";
@@ -9,17 +9,19 @@ import Icon from "../components/Icon.astro";
 import ImageGlow from "../components/ImageGlow.astro";
 import Layout from "../layouts/Layout.astro";
 
-const [posts, projects, about, workExperience, quickInfo, socials] =
-	await Promise.all([
-		getCollection("posts", (post) => post.data.draft !== true),
-		getCollection("projects"),
-		getEntry("other", "about"),
-		getCollection("workExperience"),
-		getCollection("quickInfo"),
-		getCollection("socials"),
-	]);
+const [projects, quickInfo, socials] = await Promise.all([
+	getCollection("projects"),
+	getCollection("quickInfo"),
+	getCollection("socials"),
+]);
 
-const { Content: About } = await render(about!);
+const featuredIds = ["smart-lab", "cleo"];
+const featuredProjects = projects
+	.filter((p) => featuredIds.includes(p.id))
+	.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const otherProjects = projects
+	.filter((p) => !featuredIds.includes(p.id))
+	.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 ---
 
 <Layout
@@ -34,7 +36,7 @@ const { Content: About } = await render(about!);
 				width={120}
 				height={120}
 				src={ProfilePicture}
-				alt="A purple, minimalist looking ghost."
+				alt="Profile picture"
 				loading="eager"
 			/>
 			<h2>{name}</h2>
@@ -77,109 +79,161 @@ const { Content: About } = await render(about!);
 			</ul>
 		</Card>
 	</div>
+
 	<div class="layout-grid-right" slot="right">
-		<Card>
-			<div class="header-container">
-				<Icon
-					type="lucide"
-					name="user"
-					width={24}
-					height={24}
-					class="glow-icon"
-				/>
-				<h2>About me</h2>
-			</div>
-			<div class="prose">
-				<About />
-			</div>
+		<!-- Hero -->
+		<Card class="hero-card">
+			<p class="hero-label">Open to opportunities</p>
+			<h1 class="hero-heading">
+				Building software that <span class="text-glow">actually gets used.</span>
+			</h1>
+			<p class="hero-sub">
+				Full-stack engineer shipping across web and mobile — Laravel, Flutter, .NET,
+				Vue, React. I work on real products that solve real problems.
+			</p>
 		</Card>
-		<Card>
+
+		<!-- Featured Projects -->
+		<div>
 			<div class="header-container">
 				<Icon
 					type="lucide"
-					name="rss"
-					width={24}
-					height={24}
+					name="star"
+					width={20}
+					height={20}
 					class="glow-icon"
 				/>
-				<h2>Latest Posts</h2>
+				<h2 class="no-mt">Featured Projects</h2>
 			</div>
-			<div class="content-container">
+			<div class="featured-projects-grid">
 				{
-					posts
-						.sort(
-							(a, b) => b.data.createdAt.getTime() - a.data.createdAt.getTime(),
-						)
-						.slice(0, 2)
-						.map((post) => (
-							<a href={`/blog/${post.id}`} class="post-container">
-								<div class="post-header">
-									<h3>{post.data.title}</h3>
-									<span class="post-date">
-										{post.data.createdAt.toLocaleDateString()}
+					featuredProjects.map((project) => (
+						<a href={`/projects/${project.id}`} class="featured-project-card">
+							<h3 class="featured-project-title">{project.data.title}</h3>
+							<p class="featured-project-desc">{project.data.description}</p>
+							<div class="project-info-list">
+								{project.data.info.map((item) => (
+									<span class="project-info-badge">
+										<Icon
+											type={item.icon.type}
+											name={item.icon.name as any}
+											width={13}
+											height={13}
+										/>
+										{item.text}
 									</span>
-								</div>
-								<span>{post.data.description}</span>
-							</a>
-						))
+								))}
+							</div>
+							<span class="project-link-hint">View project →</span>
+						</a>
+					))
 				}
 			</div>
-		</Card>
-		<Card>
+		</div>
+
+		<!-- Other Projects -->
+		<div>
 			<div class="header-container">
 				<Icon
 					type="lucide"
 					name="folder-git"
-					width={24}
-					height={24}
+					width={20}
+					height={20}
 					class="glow-icon"
 				/>
-				<h2>Latest Projects</h2>
+				<h2 class="no-mt">Other Projects</h2>
 			</div>
-			<div class="content-container">
+			<div class="other-projects-list">
 				{
-					projects
-						.sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
-						.slice(0, 2)
-						.map((project) => (
-							<a href={`/projects/${project.id}`} class="post-container">
-								<div class="post-header">
-									<h3>{project.data.title}</h3>
-									<span class="post-date">
-										{project.data.date.toLocaleDateString()}
-									</span>
-								</div>
-								<span>{project.data.description}</span>
-							</a>
-						))
-				}
-			</div>
-		</Card>
-		<Card>
-			<div class="header-container">
-				<Icon
-					type="lucide"
-					name="briefcase-business"
-					width={24}
-					height={24}
-					class="glow-icon"
-				/>
-				<h2>Work Experience</h2>
-			</div>
-			<div class="work-experience-container">
-				{
-					workExperience.reverse().map((entry) => (
-						<div class="work-experience-entry">
-							<span class="work-experience-duration">
-								{entry.data.duration}
-							</span>
-							<h3 class="work-experience-company">{entry.data.company}</h3>
-							<span class="work-experience-role">{entry.data.title}</span>
-							<p class="work-experience-desc">{entry.data.description}</p>
+					otherProjects.map((project) => (
+						<div class="other-project-item">
+							<div class="other-project-main">
+								<h3 class="other-project-title">{project.data.title}</h3>
+								<p class="other-project-desc">{project.data.description}</p>
+							</div>
+							<span class="stack-badge">{project.data.info[0]?.text}</span>
 						</div>
 					))
 				}
 			</div>
-		</Card>
+		</div>
+
+		<!-- Dev Methodologies -->
+		<div>
+			<div class="header-container">
+				<Icon
+					type="lucide"
+					name="git-branch"
+					width={20}
+					height={20}
+					class="glow-icon"
+				/>
+				<h2 class="no-mt">How I Work</h2>
+			</div>
+			<div class="methodologies-grid">
+				<Card>
+					<h3 class="methodology-title">Prototype-First</h3>
+					<div class="methodology-steps">
+						<span>Requirements</span>
+						<span class="step-arrow">→</span>
+						<span>Build Prototype</span>
+						<span class="step-arrow">→</span>
+						<span>Iterate</span>
+						<span class="step-arrow">→</span>
+						<span>Push</span>
+					</div>
+					<p class="methodology-desc">
+						Best when the problem is still being discovered. Fast feedback loops,
+						frequent pivots, ships early.
+					</p>
+				</Card>
+				<Card>
+					<h3 class="methodology-title">Waterfall</h3>
+					<div class="methodology-steps">
+						<span>Requirements</span>
+						<span class="step-arrow">→</span>
+						<span>Confirm</span>
+						<span class="step-arrow">→</span>
+						<span>Build</span>
+						<span class="step-arrow">→</span>
+						<span>Publish</span>
+					</div>
+					<p class="methodology-desc">
+						Best for clear, stable requirements. Structured delivery, predictable
+						milestones, fewer surprises.
+					</p>
+				</Card>
+			</div>
+		</div>
+
+		<!-- Testimonials -->
+		<div>
+			<div class="header-container">
+				<Icon
+					type="lucide"
+					name="quote"
+					width={20}
+					height={20}
+					class="glow-icon"
+				/>
+				<h2 class="no-mt">Testimonials</h2>
+			</div>
+			<div class="testimonials-grid">
+				<Card class="testimonial-card">
+					<p class="testimonial-quote">
+						"Placeholder testimonial — great to work with, delivered on time and
+						above expectations."
+					</p>
+					<span class="testimonial-author">— Name, Role @ Company</span>
+				</Card>
+				<Card class="testimonial-card">
+					<p class="testimonial-quote">
+						"Another placeholder — solid engineer, clear communicator, real
+						results."
+					</p>
+					<span class="testimonial-author">— Name, Role @ Company</span>
+				</Card>
+			</div>
+		</div>
 	</div>
 </Layout>
