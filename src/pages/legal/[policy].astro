@@ -1,0 +1,72 @@
+---
+import "../../styles/article.css";
+
+import type { CollectionEntry } from "astro:content";
+import { getCollection, render } from "astro:content";
+import type { GetStaticPaths } from "astro";
+import Card from "../../components/Card.astro";
+import Icon from "../../components/Icon.astro";
+import Layout from "../../layouts/Layout.astro";
+
+interface Props {
+	policy: CollectionEntry<"legal">;
+}
+
+const { policy } = Astro.props;
+
+export const getStaticPaths = (async () => {
+	const policies = await getCollection("legal");
+	return policies.map((policy) => ({
+		params: { policy: policy.id },
+		props: { policy },
+	}));
+}) satisfies GetStaticPaths;
+
+const { Content } = await render(policy);
+const { title, app, company, effectiveDate, lastUpdated, contact, location, description } = policy.data;
+---
+
+<Layout title={title} description={description}>
+	<div class="left" slot="left">
+		<Card class="toc-card">
+			<h2 class="no-mt">About</h2>
+			<ul class="overview-list">
+				<li>
+					<Icon type="lucide" name="smartphone" width={24} height={24} class="glow-icon" />
+					<span>{app}</span>
+				</li>
+				<li>
+					<Icon type="lucide" name="building-2" width={24} height={24} class="glow-icon" />
+					<span>{company}</span>
+				</li>
+				<li>
+					<Icon type="lucide" name="map-pin" width={24} height={24} class="glow-icon" />
+					<span>{location}</span>
+				</li>
+				<li>
+					<Icon type="lucide" name="mail" width={24} height={24} class="glow-icon" />
+					<a href={`mailto:${contact}`}>{contact}</a>
+				</li>
+			</ul>
+		</Card>
+	</div>
+
+	<article slot="right">
+		<Card>
+			<h1 class="no-mt">{title}</h1>
+			<p class="effective-date">Effective Date: {effectiveDate} &nbsp;·&nbsp; Last Updated: {lastUpdated}</p>
+			<Content />
+			<hr class="end-of-article" />
+			<a href={`${import.meta.env.BASE_URL}/legal`} class="block-link">← Back to legal</a>
+		</Card>
+	</article>
+</Layout>
+
+<style>
+	.effective-date {
+		color: #c7c7c7;
+		font-family: 'Geist Mono', 'Courier New', Courier, monospace;
+		font-size: 0.875rem;
+		margin-top: 0.25rem;
+	}
+</style>

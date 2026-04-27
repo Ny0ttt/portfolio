@@ -87,6 +87,20 @@ const projects = defineCollection({
 		}),
 });
 
+const legal = defineCollection({
+	loader: glob({ base: "src/content/legal", pattern: "**/*.{md,mdx}" }),
+	schema: z.object({
+		title: z.string(),
+		app: z.string(),
+		company: z.string(),
+		effectiveDate: z.string(),
+		lastUpdated: z.string(),
+		contact: z.string().email(),
+		location: z.string(),
+		description: z.string(),
+	}),
+});
+
 export const collections = {
 	tags,
 	posts,
@@ -95,4 +109,5 @@ export const collections = {
 	quickInfo,
 	socials,
 	workExperience,
+	legal,
 };

@@ -1,0 +1,68 @@
+---
+import "../../styles/article-list.css";
+
+import { getCollection } from "astro:content";
+import Card from "../../components/Card.astro";
+import Icon from "../../components/Icon.astro";
+import Layout from "../../layouts/Layout.astro";
+
+const policies = await getCollection("legal");
+---
+
+<Layout title="Legal" description="Privacy policies for Navitech apps." pagefindIgnore>
+	<div class="layout-grid-left" slot="left">
+		<Card class="flex-col-card">
+			<h2 class="no-mt">Legal</h2>
+			<div class="stats-div">
+				<div class="stat">
+					<h3 class="text-glow">{policies.length}</h3>
+					<span>Privacy Polic{policies.length === 1 ? "y" : "ies"}</span>
+				</div>
+			</div>
+		</Card>
+	</div>
+
+	<div class="layout-grid-right" slot="right">
+		<Card>
+			<div class="header-container">
+				<Icon type="lucide" name="shield" width={24} height={24} class="glow-icon" />
+				<h2>Privacy Policies</h2>
+			</div>
+			<div class="content-container">
+				{
+					policies.map((policy) => (
+						<a
+							href={`${import.meta.env.BASE_URL}/legal/${policy.id}`}
+							class="post-container"
+						>
+							<div class="post-header">
+								<h3>{policy.data.app}</h3>
+								<span class="post-date">Updated: {policy.data.lastUpdated}</span>
+							</div>
+							<span>{policy.data.description}</span>
+						</a>
+					))
+				}
+			</div>
+		</Card>
+	</div>
+</Layout>
+
+<style>
+	.stats-div {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.stat {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.stat h3 {
+		font-size: 2em;
+		margin: 0;
+		margin-bottom: 0.5rem;
+	}
+</style>
