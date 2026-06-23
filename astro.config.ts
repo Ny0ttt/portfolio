@@ -23,6 +23,11 @@ const config = defineConfig({
 	site: 'https://ny0ttt.github.io',
 	base: '/portfolio',
 	output: 'static',
+	vite: {
+		server: {
+			allowedHosts: 'all',
+		},
+	},
 	integrations: [
 		expressiveCode({
 			themes: [spectreDark],

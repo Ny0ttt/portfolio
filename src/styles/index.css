@@ -196,6 +196,14 @@
 	gap: 1.5rem;
 	padding: 1rem 1.25rem;
 	border-bottom: 1px solid #353535;
+	text-decoration: none;
+	color: inherit;
+	transition: background-color 0.15s ease;
+}
+
+.other-project-item:hover {
+	background-color: #1e1e1e;
+	cursor: pointer;
 }
 
 .other-project-item:last-of-type {

@@ -147,13 +147,13 @@ const otherProjects = projects
 			<div class="other-projects-list">
 				{
 					otherProjects.map((project) => (
-						<div class="other-project-item">
+						<a href={`${base}projects/${project.id}`} class="other-project-item">
 							<div class="other-project-main">
 								<h3 class="other-project-title">{project.data.title}</h3>
 								<p class="other-project-desc">{project.data.description}</p>
 							</div>
 							<span class="stack-badge">{project.data.info[0]?.text}</span>
-						</div>
+						</a>
 					))
 				}
 			</div>
