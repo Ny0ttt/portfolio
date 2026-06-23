@@ -108,7 +108,7 @@ const otherProjects = projects
 			<div class="featured-projects-grid">
 				{
 					featuredProjects.map((project) => (
-						<a href={`${import.meta.env.BASE_URL}/projects/${project.id}`} class="featured-project-card">
+						<a href={`${import.meta.env.BASE_URL}projects/${project.id}`} class="featured-project-card">
 							<h3 class="featured-project-title">{project.data.title}</h3>
 							<p class="featured-project-desc">{project.data.description}</p>
 							<div class="project-info-list">
