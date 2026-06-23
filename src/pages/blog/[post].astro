@@ -8,6 +8,7 @@ import type { GetStaticPaths } from "astro";
 import Card from "../../components/Card.astro";
 import ImageGlow from "../../components/ImageGlow.astro";
 import Layout from "../../layouts/Layout.astro";
+import { base } from "../../utils/url";
 
 /**
  * Estimates the time it takes to read a post in minutes based on:
@@ -103,7 +104,7 @@ const { Content, headings } = await render(post);
 			</div>
 			<Content />
 			<hr class="end-of-article" />
-			<a href={`${import.meta.env.BASE_URL}blog`} class="block-link" data-pagefind-ignore>← Back to blog</a>
+			<a href={`${base}blog`} class="block-link" data-pagefind-ignore>← Back to blog</a>
 		</Card>
 		{
 			giscus && (

@@ -1,9 +1,9 @@
 ---
 import { name } from "spectre:globals";
 import Icon from "./Icon.astro";
+import { base } from "../utils/url";
 
 const path = Astro.url.pathname;
-const base = import.meta.env.BASE_URL;
 ---
 <nav data-base={base}>
   <a class="site-title" href={base}>{name}</a>
