@@ -1,19 +1,11 @@
 ---
-import "../../styles/article.css";
+import "../../styles/prose.css";
 
-import type { CollectionEntry } from "astro:content";
 import { getCollection, render } from "astro:content";
-import type { GetStaticPaths } from "astro";
-import Card from "../../components/Card.astro";
-import Icon from "../../components/Icon.astro";
+import type { GetStaticPaths, InferGetStaticPropsType } from "astro";
+import MetaGrid from "../../components/MetaGrid.astro";
 import Layout from "../../layouts/Layout.astro";
 import { base } from "../../utils/url";
-
-interface Props {
-	policy: CollectionEntry<"legal">;
-}
-
-const { policy } = Astro.props;
 
 export const getStaticPaths = (async () => {
 	const policies = await getCollection("legal");
@@ -23,51 +15,59 @@ export const getStaticPaths = (async () => {
 	}));
 }) satisfies GetStaticPaths;
 
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { policy } = Astro.props;
 const { Content } = await render(policy);
-const { title, app, company, effectiveDate, lastUpdated, contact, location, description } = policy.data;
+const {
+	title,
+	app,
+	company,
+	effectiveDate,
+	lastUpdated,
+	contact,
+	location,
+	description,
+} = policy.data;
+
+const meta = [
+	{ label: "App", value: app },
+	{ label: "Company", value: company },
+	{ label: "Location", value: location },
+	{ label: "Contact", value: contact, href: `mailto:${contact}` },
+	{ label: "Effective", value: effectiveDate },
+	{ label: "Updated", value: lastUpdated },
+];
 ---
 
 <Layout title={title} description={description}>
-	<div class="left" slot="left">
-		<Card class="toc-card">
-			<h2 class="no-mt">About</h2>
-			<ul class="overview-list">
-				<li>
-					<Icon type="lucide" name="smartphone" width={24} height={24} class="glow-icon" />
-					<span>{app}</span>
-				</li>
-				<li>
-					<Icon type="lucide" name="building-2" width={24} height={24} class="glow-icon" />
-					<span>{company}</span>
-				</li>
-				<li>
-					<Icon type="lucide" name="map-pin" width={24} height={24} class="glow-icon" />
-					<span>{location}</span>
-				</li>
-				<li>
-					<Icon type="lucide" name="mail" width={24} height={24} class="glow-icon" />
-					<a href={`mailto:${contact}`}>{contact}</a>
-				</li>
-			</ul>
-		</Card>
-	</div>
+	<article class="wrap">
+		<header class="page-head">
+			<p class="label label--accent">Legal · {app}</p>
+			<h1 class="page-title">{title}</h1>
+			<MetaGrid items={meta} min={180} class="legal-meta" />
+		</header>
 
-	<article slot="right">
-		<Card>
-			<h1 class="no-mt">{title}</h1>
-			<p class="effective-date">Effective Date: {effectiveDate} &nbsp;·&nbsp; Last Updated: {lastUpdated}</p>
+		<div class="prose no-numbers legal-body">
 			<Content />
-			<hr class="end-of-article" />
-			<a href={`${base}legal`} class="block-link">← Back to legal</a>
-		</Card>
+		</div>
+
+		<footer class="post-end">
+			<a class="arrow-link" href={`${base}legal`}>← All policies</a>
+		</footer>
 	</article>
 </Layout>
 
 <style>
-	.effective-date {
-		color: #c7c7c7;
-		font-family: 'Geist Mono', 'Courier New', Courier, monospace;
-		font-size: 0.875rem;
-		margin-top: 0.25rem;
+	.legal-body {
+		padding-top: 56px;
+		font-size: 17px;
+	}
+
+	.post-end {
+		max-width: var(--measure);
+		margin-top: 72px;
+		padding-top: 24px;
+		border-top: 1px solid var(--rule);
 	}
 </style>

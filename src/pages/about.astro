@@ -1,0 +1,206 @@
+---
+import "../styles/prose.css";
+
+import { Image } from "astro:assets";
+import { getCollection, getEntry, render } from "astro:content";
+import { name } from "spectre:globals";
+import ProfilePicture from "../assets/pfp3.png";
+import Layout from "../layouts/Layout.astro";
+
+const [about, quickInfo, socials, work] = await Promise.all([
+	getEntry("other", "about"),
+	getCollection("quickInfo"),
+	getCollection("socials"),
+	getCollection("workExperience"),
+]);
+
+if (!about) throw new Error("src/content/other/about.mdx is missing");
+const { Content } = await render(about);
+
+// Newest role first.
+const roles = [...work].sort((a, b) => b.data.id - a.data.id);
+---
+
+<Layout title="About" description={`About ${name}: software engineer in Shah Alam, Selangor.`}>
+	<div class="wrap">
+		<header class="page-head about-head">
+			<div class="about-intro">
+				<p class="label label--accent">[04] About</p>
+				<h1 class="page-title">{name}</h1>
+				<ul class="facts">
+					{quickInfo.map((info) => <li class="label">{info.data.text}</li>)}
+				</ul>
+			</div>
+			<Image src={ProfilePicture} alt={`Portrait of ${name}`} width={300} height={400} class="portrait" loading="eager" />
+		</header>
+
+		<section class="section">
+			<div class="prose no-numbers">
+				<Content />
+			</div>
+		</section>
+
+		<section class="section">
+			<div class="section-head">
+				<p class="label label--accent">Experience</p>
+			</div>
+			<ol class="roles">
+				{
+					roles.map((role) => (
+						<li class="role">
+							<span class="label role-when">{role.data.duration}</span>
+							<div>
+								<h2 class="role-title">{role.data.title}</h2>
+								<p class="role-company mono">{role.data.company}</p>
+								<p class="role-desc">{role.data.description}</p>
+							</div>
+						</li>
+					))
+				}
+			</ol>
+		</section>
+
+		<section class="section" id="contact">
+			<div class="section-head">
+				<p class="label label--accent">Contact</p>
+			</div>
+			<p class="contact-lede">Want something built, or taken apart? Email is the fastest way to reach me.</p>
+			<ul class="hairline-grid contacts">
+				{
+					socials.map((s) => (
+						<li>
+							<a class="contact" href={s.data.link}>
+								<span class="label">{s.data.icon.name === "mail" ? "Email" : s.data.icon.name}</span>
+								<span class="contact-value">{s.data.text}</span>
+							</a>
+						</li>
+					))
+				}
+			</ul>
+		</section>
+	</div>
+</Layout>
+
+<style>
+	.about-head {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		align-items: flex-end;
+		gap: 32px;
+	}
+
+	.about-intro {
+		flex: 1 1 420px;
+	}
+
+	.facts {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px 24px;
+		margin: 24px 0 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.portrait {
+		width: 150px;
+		height: 200px;
+		object-fit: cover;
+		object-position: top;
+		border: 1px solid var(--rule);
+	}
+
+	.roles {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.role {
+		display: grid;
+		grid-template-columns: 200px minmax(0, 1fr);
+		gap: 8px 32px;
+		padding-block: 24px;
+		border-top: 1px solid var(--rule);
+	}
+
+	.role:last-child {
+		border-bottom: 1px solid var(--rule);
+	}
+
+	.role-when {
+		padding-top: 6px;
+	}
+
+	.role-title {
+		font-size: 21px;
+	}
+
+	.role-company {
+		margin-top: 4px;
+		font-size: 13px;
+		color: var(--muted);
+	}
+
+	.role-desc {
+		margin-top: 10px;
+		max-width: var(--measure);
+		font-size: 16px;
+		color: var(--text-2);
+	}
+
+	.contact-lede {
+		max-width: var(--measure);
+		font-size: 19px;
+		color: var(--text-2);
+		margin-bottom: 28px;
+	}
+
+	.contacts {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+	}
+
+	.contact {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		padding: 20px;
+		color: var(--text);
+		text-decoration: none;
+	}
+
+	@media (hover: hover) and (pointer: fine) {
+		.contact:hover {
+			background: var(--surface);
+			color: var(--accent);
+		}
+	}
+
+	.contact:active {
+		background: var(--surface);
+	}
+
+	.contact-value {
+		font-size: 17px;
+		overflow-wrap: anywhere;
+	}
+
+	@media (max-width: 640px) {
+		.role {
+			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.role-when {
+			padding-top: 0;
+		}
+
+		.portrait {
+			width: 105px;
+			height: 140px;
+		}
+	}
+</style>

@@ -1,242 +1,247 @@
 ---
-import "../styles/index.css";
-
 import { getCollection } from "astro:content";
 import { name, openGraph } from "spectre:globals";
-import ProfilePicture from "../assets/pfp.png";
-import Card from "../components/Card.astro";
-import Icon from "../components/Icon.astro";
-import ImageGlow from "../components/ImageGlow.astro";
+import BuildBlock from "../components/BuildBlock.astro";
+import LogEntry from "../components/LogEntry.astro";
 import Layout from "../layouts/Layout.astro";
+import { getPosts, getProjects } from "../utils/content";
 import { base } from "../utils/url";
 
-const [projects, quickInfo, socials] = await Promise.all([
-	getCollection("projects"),
+const [posts, projects, quickInfo] = await Promise.all([
+	getPosts(),
+	getProjects(),
 	getCollection("quickInfo"),
-	getCollection("socials"),
 ]);
 
+const latestPosts = posts.slice(0, 3);
+
+// Featured first, then fill to three with the newest others.
 const featuredIds = ["smart-lab", "cleo"];
-const featuredProjects = projects
-	.filter((p) => featuredIds.includes(p.id))
-	.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
-const otherProjects = projects
-	.filter((p) => !featuredIds.includes(p.id))
-	.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const builds = [
+	...projects.filter((p) => featuredIds.includes(p.id)),
+	...projects.filter((p) => !featuredIds.includes(p.id)),
+].slice(0, 3);
+
+const location =
+	quickInfo.find((i) => i.data.icon.name === "map-pin")?.data.text ?? "";
+const education =
+	quickInfo.find((i) => i.data.icon.name === "graduation-cap")?.data.text ?? "";
+
+const spec = [
+	{ label: "Primary stack", value: "Laravel · Flutter · React" },
+	{ label: "Currently", value: "Resolve automation pipeline" },
+	{ label: "Education", value: education },
+	{ label: "Status", value: "Open to opportunities", dot: true },
+];
+
+const methods = [
+	{
+		title: "Prototype-first",
+		steps: ["Requirements", "Build prototype", "Iterate", "Push"],
+		desc: "Best when the problem is still being discovered. Fast feedback loops, frequent pivots, ships early.",
+	},
+	{
+		title: "Waterfall",
+		steps: ["Requirements", "Confirm", "Build", "Publish"],
+		desc: "Best for clear, stable requirements. Structured delivery, predictable milestones, fewer surprises.",
+	},
+];
 ---
 
-<Layout
-	title={openGraph.home.title || name}
-	description={openGraph.home.description}
-	pagefindIgnore
->
-	<div class="layout-grid-left" slot="left">
-		<Card class="flex-col-card">
-			<ImageGlow
-				quality={100}
-				width={120}
-				height={120}
-				src={ProfilePicture}
-				alt="Profile picture"
-				loading="eager"
-			/>
-			<h2>{name}</h2>
-			<ul class="overview-list">
-				{
-					quickInfo.map((info) => (
-						<li>
-							<Icon
-								type={info.data.icon.type}
-								name={info.data.icon.name as any}
-								width={24}
-								height={24}
-								class="glow-icon"
-							/>
-							<span>{info.data.text}</span>
-						</li>
-					))
-				}
-			</ul>
-		</Card>
-		<Card>
-			<h3 class="no-mt">Socials</h3>
-			<ul class="overview-list">
-				{
-					socials.map((item) => (
-						<li>
-							<a href={item.data.link} class="socials-link">
-								<Icon
-									type={item.data.icon.type}
-									name={item.data.icon.name as any}
-									width={24}
-									height={24}
-									class="glow-icon"
-								/>
-								<span>{item.data.text}</span>
-							</a>
-						</li>
-					))
-				}
-			</ul>
-		</Card>
-	</div>
-
-	<div class="layout-grid-right" slot="right">
-		<!-- Hero -->
-		<Card class="hero-card">
-			<p class="hero-label">Open to opportunities</p>
-			<h1 class="hero-heading">
-				From requirements to production — <span class="text-glow">full-stack, end to end.</span>
+<Layout title={openGraph.home.title || name} description={openGraph.home.description} pagefindIgnore>
+	<div class="wrap">
+		<section class="hero">
+			<p class="label hero-kicker">[00] Software engineer — {location}</p>
+			<h1 class="hero-title">
+				Systems, tooling and the formats underneath. <span class="muted">Built, taken apart, documented.</span>
 			</h1>
-			<p class="hero-sub">
-				Full-stack engineer shipping across web and mobile — Laravel, Flutter, .NET,
-				Vue, React. I work on real products that solve real problems.
-			</p>
-		</Card>
-
-		<!-- Featured Projects -->
-		<div>
-			<div class="header-container">
-				<Icon
-					type="lucide"
-					name="star"
-					width={20}
-					height={20}
-					class="glow-icon"
-				/>
-				<h2 class="no-mt">Featured Projects</h2>
-			</div>
-			<div class="featured-projects-grid">
+			<dl class="hairline-grid spec">
 				{
-					featuredProjects.map((project) => (
-						<a href={`${base}projects/${project.id}`} class="featured-project-card">
-							<h3 class="featured-project-title">{project.data.title}</h3>
-							<p class="featured-project-desc">{project.data.description}</p>
-							<div class="project-info-list">
-								{project.data.info.map((item) => (
-									<span class="project-info-badge">
-										<Icon
-											type={item.icon.type}
-											name={item.icon.name as any}
-											width={13}
-											height={13}
-										/>
-										{item.text}
-									</span>
+					spec.map((item) => (
+						<div class="spec-cell">
+							<dt class="label">{item.label}</dt>
+							<dd>
+								{item.dot && <span class="dot" aria-hidden="true" />}
+								{item.value}
+							</dd>
+						</div>
+					))
+				}
+			</dl>
+		</section>
+
+		<section class="section logbook">
+			<div class="logbook-side">
+				<p class="label label--accent">[01] Logbook</p>
+				<p class="side-copy">Long-form write-ups. What I opened, what was inside, what broke.</p>
+				<a class="arrow-link" href={`${base}blog`}>All entries →</a>
+			</div>
+			<div class="logbook-list">
+				{
+					latestPosts.length > 0 ? (
+						latestPosts.map((post) => <LogEntry post={post} />)
+					) : (
+						<p class="empty">First entry is being written.</p>
+					)
+				}
+			</div>
+		</section>
+
+		<section class="section">
+			<div class="section-head">
+				<p class="label label--accent">[02] Builds</p>
+				<a class="arrow-link" href={`${base}projects`}>Full index →</a>
+			</div>
+			<div class="hairline-grid builds">
+				{builds.map((project) => <BuildBlock project={project} />)}
+			</div>
+		</section>
+
+		<section class="section">
+			<div class="section-head">
+				<p class="label label--accent">[03] How I work</p>
+			</div>
+			<div class="hairline-grid methods">
+				{
+					methods.map((m) => (
+						<div class="method">
+							<h3 class="method-title">{m.title}</h3>
+							<ol class="method-steps">
+								{m.steps.map((s) => (
+									<li>{s}</li>
 								))}
-							</div>
-							<span class="project-link-hint">View project →</span>
-						</a>
+							</ol>
+							<p class="method-desc">{m.desc}</p>
+						</div>
 					))
 				}
 			</div>
-		</div>
-
-		<!-- Other Projects -->
-		<div>
-			<div class="header-container">
-				<Icon
-					type="lucide"
-					name="folder-git"
-					width={20}
-					height={20}
-					class="glow-icon"
-				/>
-				<h2 class="no-mt">Other Projects</h2>
-			</div>
-			<div class="other-projects-list">
-				{
-					otherProjects.map((project) => (
-						<a href={`${base}projects/${project.id}`} class="other-project-item">
-							<div class="other-project-main">
-								<h3 class="other-project-title">{project.data.title}</h3>
-								<p class="other-project-desc">{project.data.description}</p>
-							</div>
-							<span class="stack-badge">{project.data.info[0]?.text}</span>
-						</a>
-					))
-				}
-			</div>
-		</div>
-
-		<!-- Dev Methodologies -->
-		<div>
-			<div class="header-container">
-				<Icon
-					type="lucide"
-					name="git-branch"
-					width={20}
-					height={20}
-					class="glow-icon"
-				/>
-				<h2 class="no-mt">How I Work</h2>
-			</div>
-			<div class="methodologies-grid">
-				<Card>
-					<h3 class="methodology-title">Prototype-First</h3>
-					<div class="methodology-steps">
-						<span>Requirements</span>
-						<span class="step-arrow">→</span>
-						<span>Build Prototype</span>
-						<span class="step-arrow">→</span>
-						<span>Iterate</span>
-						<span class="step-arrow">→</span>
-						<span>Push</span>
-					</div>
-					<p class="methodology-desc">
-						Best when the problem is still being discovered. Fast feedback loops,
-						frequent pivots, ships early.
-					</p>
-				</Card>
-				<Card>
-					<h3 class="methodology-title">Waterfall</h3>
-					<div class="methodology-steps">
-						<span>Requirements</span>
-						<span class="step-arrow">→</span>
-						<span>Confirm</span>
-						<span class="step-arrow">→</span>
-						<span>Build</span>
-						<span class="step-arrow">→</span>
-						<span>Publish</span>
-					</div>
-					<p class="methodology-desc">
-						Best for clear, stable requirements. Structured delivery, predictable
-						milestones, fewer surprises.
-					</p>
-				</Card>
-			</div>
-		</div>
-
-		<!-- Testimonials -->
-		<!--
-		<div>
-			<div class="header-container">
-				<Icon
-					type="lucide"
-					name="quote"
-					width={20}
-					height={20}
-					class="glow-icon"
-				/>
-				<h2 class="no-mt">Testimonials</h2>
-			</div>
-			<div class="testimonials-grid">
-				<Card class="testimonial-card">
-					<p class="testimonial-quote">
-						"Placeholder testimonial — great to work with, delivered on time and
-						above expectations."
-					</p>
-					<span class="testimonial-author">— Name, Role @ Company</span>
-				</Card>
-				<Card class="testimonial-card">
-					<p class="testimonial-quote">
-						"Another placeholder — solid engineer, clear communicator, real
-						results."
-					</p>
-					<span class="testimonial-author">— Name, Role @ Company</span>
-				</Card>
-			</div>
-		</div>
-		-->
+		</section>
 	</div>
 </Layout>
+
+<style>
+	.hero {
+		padding-block: 96px 80px;
+		border-bottom: 1px solid var(--rule);
+	}
+
+	.hero-kicker {
+		font-size: 12px;
+		letter-spacing: 0.12em;
+		margin-bottom: 28px;
+	}
+
+	.hero-title {
+		max-width: 940px;
+		font-size: clamp(38px, 5.4vw, 68px);
+		line-height: 1.04;
+		letter-spacing: -0.025em;
+	}
+
+	.spec {
+		margin: 56px 0 0;
+		grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+	}
+
+	.spec-cell {
+		padding: 20px;
+	}
+
+	.spec-cell dd {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin: 10px 0 0;
+		font-size: 17px;
+	}
+
+	.dot {
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: var(--accent);
+		flex: none;
+	}
+
+	.logbook {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 32px 48px;
+	}
+
+	.logbook-side {
+		flex: 1 1 220px;
+	}
+
+	.side-copy {
+		margin: 14px 0 20px;
+		max-width: 240px;
+		font-size: 15px;
+		color: var(--muted);
+	}
+
+	.logbook-list {
+		flex: 999 1 600px;
+		min-width: 0;
+	}
+
+	.empty {
+		padding-block: 24px;
+		border-block: 1px solid var(--rule);
+		font-family: var(--font-mono);
+		font-size: 13px;
+		color: var(--muted);
+	}
+
+	.builds {
+		grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+	}
+
+	.methods {
+		grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+	}
+
+	.method {
+		padding: 28px;
+	}
+
+	.method-title {
+		font-size: 22px;
+	}
+
+	.method-steps {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px 0;
+		margin: 16px 0 0;
+		padding: 0;
+		list-style: none;
+		font-family: var(--font-mono);
+		font-size: 12px;
+		letter-spacing: 0.04em;
+		color: var(--text);
+	}
+
+	.method-steps li + li::before {
+		content: "→";
+		margin-inline: 10px;
+		color: var(--accent);
+	}
+
+	.method-desc {
+		margin-top: 16px;
+		font-size: 15px;
+		color: var(--text-2);
+	}
+
+	@media (max-width: 640px) {
+		.hero {
+			padding-block: 56px 48px;
+		}
+
+		.spec {
+			margin-top: 40px;
+		}
+	}
+</style>

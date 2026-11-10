@@ -3,38 +3,31 @@ import Layout from "../layouts/Layout.astro";
 import { base } from "../utils/url";
 ---
 
-<Layout
-  title={"404"}
-  description={"This page could not be found."}
-	pagefindIgnore
->
-  <div class="notfound-container" slot="404">
-    <h1 class="text-glow">404</h1>
-    <p>This page could not be found.</p>
-    <a class="block-link" href={base}>← Back to the homepage</a>
-  </div>
+<Layout title="404" description="This page could not be found." pagefindIgnore>
+	<div class="wrap">
+		<section class="page-head notfound">
+			<p class="label label--accent">ERR-404</p>
+			<h1 class="page-title">Nothing at this address.</h1>
+			<p class="page-lede">The page moved, or it never existed.</p>
+			<p class="links">
+				<a class="arrow-link" href={base}>← Home</a>
+				<a class="arrow-link" href={`${base}blog`}>Writing</a>
+				<a class="arrow-link" href={`${base}projects`}>Projects</a>
+			</p>
+		</section>
+	</div>
 </Layout>
+
 <style>
-  .notfound-container {
-    display: flex;
-    height: 80vh;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    text-align: center;
-    flex-direction: column;
-  }
+	.notfound {
+		border-bottom: 0;
+		padding-block: 120px;
+	}
 
-  .notfound-container h1 {
-    font-size: 4rem;
-    margin: 0;
-  }
-
-  .notfound-container p {
-    font-size: 1.25em;
-  }
-
-  .block-link {
-    margin-top: 1rem;
-  }
+	.links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 24px;
+		margin-top: 40px;
+	}
 </style>

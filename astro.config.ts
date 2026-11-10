@@ -4,7 +4,7 @@ import { defineConfig } from 'astro/config';
 import expressiveCode from 'astro-expressive-code';
 import { loadEnv } from 'vite';
 import spectre, { type GiscusMapping } from './package/src';
-import { spectreDark } from './src/ec-theme';
+import { logbookCode } from './src/ec-theme';
 
 // const {
 // 	GISCUS_REPO,
@@ -30,25 +30,54 @@ const config = defineConfig({
 	},
 	integrations: [
 		expressiveCode({
-			themes: [spectreDark],
+			themes: [logbookCode],
+			useDarkModeMediaQuery: false,
+			styleOverrides: {
+				borderRadius: '0px',
+				borderColor: 'var(--code-rule)',
+				codeBackground: 'var(--code-bg)',
+				codeForeground: 'var(--code-fg)',
+				codeFontFamily: "'JetBrains Mono', ui-monospace, monospace",
+				codeFontSize: '14px',
+				uiFontFamily: "'JetBrains Mono', ui-monospace, monospace",
+				frames: {
+					frameBoxShadowCssValue: 'none',
+					editorBackground: 'var(--code-bg)',
+					editorTabBarBackground: 'var(--code-bg)',
+					editorActiveTabBackground: 'var(--code-bg)',
+					editorActiveTabForeground: 'var(--code-muted)',
+					editorActiveTabIndicatorTopColor: 'transparent',
+					editorActiveTabIndicatorBottomColor: 'var(--accent)',
+					editorTabBarBorderBottomColor: 'var(--code-rule)',
+					editorTabBorderRadius: '0px',
+					terminalBackground: 'var(--code-bg)',
+					terminalTitlebarBackground: 'var(--code-bg)',
+					terminalTitlebarForeground: 'var(--code-muted)',
+					terminalTitlebarBorderBottomColor: 'var(--code-rule)',
+					terminalTitlebarDotsOpacity: '0.35',
+				},
+			},
 		}),
 		mdx(),
 		sitemap(),
 		spectre({
-			name: 'Navigate Technologies',
+			name: 'Rasyid Hamidun',
+			themeColor: '#a8420a',
 			openGraph: {
 				home: {
-					title: 'Navigate Technologies',
-					description: 'Ahmad Ameerul Rasyid — Software Engineer. Full-stack developer building useful products.',
+					title: 'Rasyid Hamidun',
+					description: 'Rasyid Hamidun — software engineer. Systems, tooling and the formats underneath: built, taken apart, documented.',
 				},
 				blog: {
-					title: 'Blog',
-					description: 'Thoughts and writeups by Ahmad Ameerul Rasyid.',
+					title: 'Writing',
+					description: 'Long-form write-ups by Rasyid Hamidun: what I opened, what was inside, what broke.',
 				},
 				projects: {
 					title: 'Projects',
+					description: 'Things Rasyid Hamidun has built, with the problem, the build and the result for each.',
 				},
 			},
+			giscus: false,
 			// giscus: {
 			// 	repository: GISCUS_REPO,
 			// 	repositoryId: GISCUS_REPO_ID,

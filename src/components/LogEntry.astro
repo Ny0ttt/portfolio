@@ -1,0 +1,92 @@
+---
+import type { Post } from "../utils/content";
+import { formatDate } from "../utils/content";
+import { base } from "../utils/url";
+
+interface Props {
+	post: Post & { logId: string };
+}
+
+const { post } = Astro.props;
+const tags = post.data.tags.map((t) => t.id);
+---
+
+<a class="entry" href={`${base}blog/${post.id}`} data-tags={tags.join(",")}>
+	<span class="entry-id label">{post.logId}</span>
+	<span class="entry-main">
+		<span class="entry-title">{post.data.title}</span>
+		<span class="entry-dek">{post.data.description}</span>
+		<span class="entry-meta label">
+			{[...tags, formatDate(post.data.createdAt)].join(" / ")}
+			{post.data.draft && " / draft"}
+		</span>
+	</span>
+</a>
+
+<style>
+	.entry {
+		display: grid;
+		grid-template-columns: 96px minmax(0, 1fr);
+		gap: 24px;
+		padding-block: 24px;
+		border-top: 1px solid var(--rule);
+		color: var(--text);
+		text-decoration: none;
+	}
+
+	.entry:last-child {
+		border-bottom: 1px solid var(--rule);
+	}
+
+	.entry:active .entry-title {
+		color: var(--accent);
+	}
+
+	.entry-id {
+		padding-top: 7px;
+		font-size: 12px;
+	}
+
+	.entry-title {
+		display: block;
+		font-size: 26px;
+		font-weight: 500;
+		letter-spacing: -0.01em;
+		line-height: 1.25;
+		transition: color var(--dur-fast) var(--ease-out);
+	}
+
+	@media (hover: hover) and (pointer: fine) {
+		.entry:hover .entry-title {
+			color: var(--accent);
+		}
+	}
+
+	.entry-dek {
+		display: block;
+		margin-top: 8px;
+		font-size: 16px;
+		line-height: 1.55;
+		color: var(--muted);
+	}
+
+	.entry-meta {
+		display: block;
+		margin-top: 12px;
+	}
+
+	@media (max-width: 640px) {
+		.entry {
+			grid-template-columns: minmax(0, 1fr);
+			gap: 8px;
+		}
+
+		.entry-id {
+			padding-top: 0;
+		}
+
+		.entry-title {
+			font-size: 22px;
+		}
+	}
+</style>

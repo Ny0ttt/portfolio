@@ -1,20 +1,20 @@
 import githubDark from "@shikijs/themes/github-dark";
 import type { ThemeRegistration } from "shiki";
 
-const spectreDark: ThemeRegistration = {
+/**
+ * Code blocks stay dark in both site themes (see plan: --code-bg).
+ * Colours of the frame itself come from CSS variables via styleOverrides
+ * in astro.config.ts, so this only needs the syntax palette.
+ */
+const logbookCode: ThemeRegistration = {
 	...githubDark,
-	name: "Spectre Dark",
+	name: "Logbook Code",
+	type: "dark",
 	colors: {
 		...githubDark.colors,
-		"activityBar.background": "#303030",
-		"editor.background": "#202020",
-		"statusBar.background": "#303030",
-		"statusBarItem.remoteBackground": "#303030",
-		"tab.activeBackground": "#303030",
-		"titleBar.activeBackground": "#303030",
-		"editorGroupHeader.tabsBackground": "#282828",
-		"panel.background": "#202020",
+		"editor.background": "#1f1c17",
+		"editor.foreground": "#ebe5d8",
 	},
 };
 
-export { spectreDark };
+export { logbookCode };

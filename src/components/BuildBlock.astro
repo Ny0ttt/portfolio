@@ -1,0 +1,103 @@
+---
+import type { Project } from "../utils/content";
+import { stackOf } from "../utils/content";
+import { base } from "../utils/url";
+
+interface Props {
+	project: Project & { buildId: string };
+}
+
+const { project } = Astro.props;
+const { title, date, problem, built, result, description } = project.data;
+
+// Spec rows: use the explicit problem/built/result when written,
+// otherwise fall back to the description so no block is ever empty.
+const rows = [
+	...(problem ? [{ label: "Problem", value: problem }] : []),
+	{ label: "Built", value: built ?? description },
+	...(result ? [{ label: "Result", value: result }] : []),
+	...(stackOf(project)
+		? [{ label: "Stack", value: stackOf(project)!, mono: true }]
+		: []),
+];
+---
+
+<a class="build" href={`${base}projects/${project.id}`}>
+	<div class="build-top label">
+		<span>{project.buildId}</span><span>{date.getFullYear()}</span>
+	</div>
+	<h3 class="build-title">{title}</h3>
+	<dl class="build-rows">
+		{
+			rows.map((row) => (
+				<>
+					<dt class="label">{row.label}</dt>
+					<dd class:list={{ mono: row.mono }}>{row.value}</dd>
+				</>
+			))
+		}
+	</dl>
+	<span class="build-more">Read the write-up →</span>
+</a>
+
+<style>
+	.build {
+		display: flex;
+		flex-direction: column;
+		padding: 28px;
+		color: var(--text);
+		text-decoration: none;
+		transition: background-color var(--dur-fast) var(--ease-out);
+	}
+
+	@media (hover: hover) and (pointer: fine) {
+		.build:hover {
+			background: var(--surface);
+			color: var(--text);
+		}
+	}
+
+	.build:active {
+		background: var(--surface);
+	}
+
+	.build-top {
+		display: flex;
+		justify-content: space-between;
+	}
+
+	.build-title {
+		margin-top: 18px;
+		font-size: 24px;
+	}
+
+	.build-rows {
+		display: grid;
+		grid-template-columns: 76px minmax(0, 1fr);
+		gap: 10px 16px;
+		margin: 18px 0 0;
+		font-size: 14px;
+		line-height: 1.5;
+	}
+
+	.build-rows dt {
+		padding-top: 2px;
+	}
+
+	.build-rows dd {
+		margin: 0;
+	}
+
+	.build-rows dd.mono {
+		font-size: 13px;
+	}
+
+	.build-more {
+		margin-top: auto;
+		padding-top: 24px;
+		font-family: var(--font-mono);
+		font-size: 12px;
+		color: var(--accent);
+	}
+
+</style>

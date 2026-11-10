@@ -1,69 +1,68 @@
 ---
-import "../../styles/article-list.css";
-
 import { getCollection } from "astro:content";
-import Card from "../../components/Card.astro";
-import Icon from "../../components/Icon.astro";
 import Layout from "../../layouts/Layout.astro";
 import { base } from "../../utils/url";
 
 const policies = await getCollection("legal");
 ---
 
-<Layout title="Legal" description="Privacy policies for Navitech apps." pagefindIgnore>
-	<div class="layout-grid-left" slot="left">
-		<Card class="flex-col-card">
-			<h2 class="no-mt">Legal</h2>
-			<div class="stats-div">
-				<div class="stat">
-					<h3 class="text-glow">{policies.length}</h3>
-					<span>Privacy Polic{policies.length === 1 ? "y" : "ies"}</span>
-				</div>
-			</div>
-		</Card>
-	</div>
+<Layout title="Legal" description="Privacy policies for apps by Rasyid Hamidun." pagefindIgnore>
+	<div class="wrap">
+		<header class="page-head">
+			<p class="label label--accent">Legal · {policies.length} {policies.length === 1 ? "policy" : "policies"}</p>
+			<h1 class="page-title">Privacy policies.</h1>
+		</header>
 
-	<div class="layout-grid-right" slot="right">
-		<Card>
-			<div class="header-container">
-				<Icon type="lucide" name="shield" width={24} height={24} class="glow-icon" />
-				<h2>Privacy Policies</h2>
-			</div>
-			<div class="content-container">
-				{
-					policies.map((policy) => (
-						<a
-							href={`${base}legal/${policy.id}`}
-							class="post-container"
-						>
-							<div class="post-header">
-								<h3>{policy.data.app}</h3>
-								<span class="post-date">Updated: {policy.data.lastUpdated}</span>
-							</div>
-							<span>{policy.data.description}</span>
+		<ul class="list">
+			{
+				policies.map((policy) => (
+					<li>
+						<a class="row" href={`${base}legal/${policy.id}`}>
+							<span class="row-title">{policy.data.app}</span>
+							<span class="row-desc">{policy.data.description}</span>
+							<span class="label">Updated {policy.data.lastUpdated}</span>
 						</a>
-					))
-				}
-			</div>
-		</Card>
+					</li>
+				))
+			}
+		</ul>
 	</div>
 </Layout>
 
 <style>
-	.stats-div {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-	}
-
-	.stat {
-		display: flex;
-		flex-direction: column;
-	}
-
-	.stat h3 {
-		font-size: 2em;
+	.list {
 		margin: 0;
-		margin-bottom: 0.5rem;
+		padding: 0;
+		list-style: none;
+	}
+
+	.row {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+		padding-block: 24px;
+		border-bottom: 1px solid var(--rule);
+		color: var(--text);
+		text-decoration: none;
+	}
+
+	.row-title {
+		font-size: 22px;
+		font-weight: 500;
+	}
+
+	@media (hover: hover) and (pointer: fine) {
+		.row:hover .row-title {
+			color: var(--accent);
+		}
+	}
+
+	.row:active .row-title {
+		color: var(--accent);
+	}
+
+	.row-desc {
+		font-size: 15px;
+		color: var(--muted);
 	}
 </style>

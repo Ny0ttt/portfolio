@@ -64,7 +64,7 @@ const posts = defineCollection({
 			description: z.string(),
 			tags: z.array(reference("tags")),
 			draft: z.boolean().optional().default(false),
-			image: image(),
+			image: image().optional(),
 		}),
 });
 
@@ -75,8 +75,12 @@ const projects = defineCollection({
 			title: z.string(),
 			description: z.string(),
 			date: z.coerce.date(),
-			image: image(),
+			image: image().optional(),
 			link: z.string().url().optional(),
+			/** One-line spec rows shown on the home page and project header. */
+			problem: z.string().optional(),
+			built: z.string().optional(),
+			result: z.string().optional(),
 			info: z.array(
 				z.object({
 					text: z.string(),

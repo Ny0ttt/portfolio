@@ -1,0 +1,48 @@
+---
+title: "Decoding DaVinci Resolve's Project.db"
+description: "[Standfirst in your words: Resolve's scripting API is Studio-only, so you went around it.]"
+createdAt: 2026-11-10
+draft: true
+tags:
+  - reverse-engineering
+  - resolve
+---
+
+import Note from "../../components/Note.astro";
+
+{/*
+  OUTLINE ONLY — assembled from video-01-beat-sheet.md. Every [bracket] is yours to write.
+  Same rule as the video: no claim that hasn't been run, every number shown with its output.
+  Remove `draft: true` above when it's ready; until then it only shows in `pnpm dev`.
+*/}
+
+[Opening paragraph: the wall. Resolve has a scripting API, it's Studio-only, and on the free edition `fusionscript` doesn't load at all. You wanted it on Linux, on free Resolve, and weren't paying to find out whether it would work.]
+
+## The wall
+
+[What exactly is blocked, and where Blackmagic documents the thing you can't call.]
+
+## Doors that failed
+
+[The wrong turns, in order. Don't cut this. It's the part that shows a person did the work.]
+
+<Note label="Dead end">
+[One door that looked promising and why it closed.]
+</Note>
+
+## Opening Project.db
+
+[Premise → method → discovery → the trap.]
+
+```bash
+# [real command you ran]
+# [real output]
+```
+
+## Making the import work
+
+[The relink, and what a fresh clone needs to reproduce it.]
+
+## What I'd do next
+
+[Close. Link the repo and the video once they're public.]

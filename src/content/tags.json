@@ -1,5 +1,6 @@
 [
-	{
-		"id": "guide"
-	}
+	{ "id": "reverse-engineering" },
+	{ "id": "resolve" },
+	{ "id": "pipelines" },
+	{ "id": "tooling" }
 ]

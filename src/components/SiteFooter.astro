@@ -1,0 +1,58 @@
+---
+import { getCollection } from "astro:content";
+import { base } from "../utils/url";
+
+const socials = await getCollection("socials");
+const email = socials.find((s) => s.data.link.startsWith("mailto:"));
+const github = socials.find((s) => s.data.link.includes("github.com"));
+---
+
+<footer class="site-footer">
+	<div class="wrap footer-row">
+		<span>
+			{email && <a href={email.data.link}>{email.data.text}</a>}
+			{email && github && " · "}
+			{github && <a href={github.data.link}>github.com/{github.data.text}</a>}
+		</span>
+		<span class="footer-right">
+			<a href={`${base}legal`}>Legal</a>
+			<span>Shah Alam, MY · {new Date().getFullYear()}</span>
+		</span>
+	</div>
+</footer>
+
+<style>
+	.site-footer {
+		border-top: 1px solid var(--rule);
+		margin-top: 96px;
+	}
+
+	.footer-row {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: 16px 40px;
+		padding-block: 32px calc(56px + env(safe-area-inset-bottom, 0px));
+		font-family: var(--font-mono);
+		font-size: 12px;
+		letter-spacing: 0.04em;
+		color: var(--muted);
+	}
+
+	.footer-row a {
+		color: var(--muted);
+	}
+
+	@media (hover: hover) and (pointer: fine) {
+		.footer-row a:hover {
+			color: var(--accent);
+		}
+	}
+
+	.footer-right {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 24px;
+		text-transform: uppercase;
+	}
+</style>

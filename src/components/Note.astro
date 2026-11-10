@@ -1,0 +1,42 @@
+---
+/**
+ * Boxed aside for posts. In MDX:
+ *   import Note from "../../components/Note.astro";
+ *   <Note label="Dead end">What didn't work and why.</Note>
+ */
+interface Props {
+	label?: string;
+}
+
+const { label = "Dead end" } = Astro.props;
+---
+
+<aside class="note">
+	<div class="label label--accent">{label}</div>
+	<div class="note-body"><slot /></div>
+</aside>
+
+<style>
+	.note {
+		margin-block: 32px;
+		padding: 18px 22px;
+		border: 1px solid var(--rule);
+		border-top: 2px solid var(--accent);
+		background: var(--surface);
+	}
+
+	.note-body {
+		margin-top: 8px;
+		font-size: 16px;
+		line-height: 1.6;
+		color: var(--text-2);
+	}
+
+	.note-body :global(p) {
+		margin: 0 0 12px;
+	}
+
+	.note-body :global(p:last-child) {
+		margin-bottom: 0;
+	}
+</style>

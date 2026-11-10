@@ -1,0 +1,58 @@
+---
+/**
+ * The spec-sheet row of labelled cells: FILED / READ / SUBJECT …
+ * Values may contain links, so each item can pass `href`.
+ */
+interface Item {
+	label: string;
+	value: string;
+	href?: string;
+	/** Span the full row (long values such as many tags) */
+	wide?: boolean;
+}
+
+interface Props {
+	items: Item[];
+	min?: number;
+	class?: string;
+}
+
+const { items, min = 160, class: className } = Astro.props;
+---
+
+<dl class:list={["hairline-grid", "meta-grid", className]} style={`--min: ${min}px`}>
+	{
+		items.map((item) => (
+			<div class:list={["meta-cell", { wide: item.wide }]}>
+				<dt class="label">{item.label}</dt>
+				<dd>{item.href ? <a href={item.href}>{item.value}</a> : item.value}</dd>
+			</div>
+		))
+	}
+</dl>
+
+<style>
+	/* Flex, not grid: cells grow to fill each row, so the hairlines never
+	   leave an empty track when a wide cell drops to its own row. */
+	.hairline-grid.meta-grid {
+		display: flex;
+		flex-wrap: wrap;
+		margin: 40px 0 0;
+	}
+
+	.meta-cell {
+		flex: 1 1 var(--min);
+		padding: 14px 16px;
+	}
+
+	.meta-cell.wide {
+		flex-basis: 100%;
+	}
+
+	dd {
+		margin: 6px 0 0;
+		font-size: 15px;
+		line-height: 1.4;
+		overflow-wrap: anywhere;
+	}
+</style>

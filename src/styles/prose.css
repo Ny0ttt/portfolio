@@ -1,0 +1,195 @@
+/* ------------------------------------------------------------------
+   Long-form content (posts, project write-ups, legal pages).
+   h2s are auto-numbered 01, 02 …; code blocks are labelled FIG. n.
+------------------------------------------------------------------- */
+.prose {
+	max-width: var(--measure);
+	min-width: 0;
+	font-size: 19px;
+	line-height: 1.7;
+	counter-reset: section fig;
+}
+
+.prose > * + * {
+	margin-top: 24px;
+}
+
+.prose p,
+.prose ul,
+.prose ol {
+	margin-bottom: 0;
+}
+
+.prose p,
+.prose li,
+.prose blockquote,
+.prose h2,
+.prose h3 {
+	overflow-wrap: anywhere;
+}
+
+.prose h2 {
+	counter-increment: section;
+	display: flex;
+	gap: 14px;
+	align-items: baseline;
+	margin-top: 56px;
+	margin-bottom: -6px;
+	font-size: 28px;
+	letter-spacing: -0.015em;
+	scroll-margin-top: 24px;
+}
+
+.prose h2::before {
+	content: counter(section, decimal-leading-zero);
+	font-family: var(--font-mono);
+	font-size: 13px;
+	letter-spacing: 0.1em;
+	color: var(--accent);
+	flex: none;
+}
+
+.prose.no-numbers h2::before {
+	content: none;
+}
+
+.prose h3 {
+	margin-top: 40px;
+	margin-bottom: -8px;
+	font-size: 21px;
+	scroll-margin-top: 24px;
+}
+
+.prose h4 {
+	margin-top: 32px;
+	font-family: var(--font-mono);
+	font-size: 12px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--muted);
+}
+
+.prose ul,
+.prose ol {
+	padding-left: 1.3em;
+}
+
+.prose li + li {
+	margin-top: 8px;
+}
+
+.prose li::marker {
+	color: var(--muted);
+}
+
+.prose strong {
+	font-weight: 600;
+}
+
+.prose hr {
+	border: 0;
+	border-top: 1px solid var(--rule);
+	margin-block: 48px;
+}
+
+/* Inline code (not inside Expressive Code blocks) */
+.prose :not(pre) > code {
+	font-family: var(--font-mono);
+	font-size: 0.82em;
+	padding: 1px 6px;
+	background: var(--surface);
+	border: 1px solid var(--rule);
+	overflow-wrap: anywhere;
+}
+
+/* Quotes double as "coming soon" / callout blocks in existing content */
+.prose blockquote {
+	margin-inline: 0;
+	padding: 14px 20px;
+	border-left: 2px solid var(--accent);
+	background: var(--surface);
+	color: var(--text-2);
+	font-size: 17px;
+}
+
+.prose blockquote > * + * {
+	margin-top: 12px;
+}
+
+/* Tables: hairline, scroll inside their own box on phones */
+.prose table {
+	display: block;
+	width: 100%;
+	max-width: 100%;
+	overflow-x: auto;
+	border-collapse: collapse;
+	font-size: 16px;
+	line-height: 1.5;
+}
+
+.prose th,
+.prose td {
+	padding: 10px 16px 10px 0;
+	border-bottom: 1px solid var(--rule);
+	text-align: left;
+	vertical-align: top;
+}
+
+.prose th {
+	font-family: var(--font-mono);
+	font-size: 11px;
+	font-weight: 400;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--muted);
+	border-bottom-color: var(--text);
+}
+
+.prose img,
+.prose iframe,
+.prose video {
+	width: 100%;
+	height: auto;
+	border: 1px solid var(--rule);
+}
+
+.prose iframe {
+	aspect-ratio: 16 / 9;
+}
+
+/* Expressive Code blocks → FIG. n */
+.prose .expressive-code {
+	counter-increment: fig;
+	margin-top: 32px;
+}
+
+.prose .expressive-code::before {
+	content: "FIG. " counter(fig);
+	display: block;
+	margin-bottom: 8px;
+	font-family: var(--font-mono);
+	font-size: 11px;
+	letter-spacing: 0.1em;
+	color: var(--muted);
+}
+
+/* Anchor offset for headings when jumping from the TOC */
+.prose [id] {
+	scroll-margin-top: 24px;
+}
+
+@media (max-width: 640px) {
+	.prose {
+		font-size: 17px;
+	}
+
+	.prose h2 {
+		font-size: 23px;
+		margin-top: 44px;
+	}
+}
+
+/* No extra gap above whatever opens the article */
+.prose > :first-child {
+	margin-top: 0;
+}
