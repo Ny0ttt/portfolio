@@ -16,7 +16,7 @@ const [posts, projects, quickInfo] = await Promise.all([
 const latestPosts = posts.slice(0, 3);
 
 // Featured first, then fill to three with the newest others.
-const featuredIds = ["smart-lab", "cleo"];
+const featuredIds = ["davinci-resolve-linux-automation", "calcbench", "buckt"];
 const builds = [
 	...projects.filter((p) => featuredIds.includes(p.id)),
 	...projects.filter((p) => !featuredIds.includes(p.id)),
@@ -28,7 +28,7 @@ const education =
 	quickInfo.find((i) => i.data.icon.name === "graduation-cap")?.data.text ?? "";
 
 const spec = [
-	{ label: "Primary stack", value: "Laravel · Flutter · React" },
+	{ label: "Primary stack", value: "TypeScript · Python · Laravel · React Native" },
 	{ label: "Currently", value: "Resolve automation pipeline" },
 	{ label: "Education", value: education },
 	{ label: "Status", value: "Open to opportunities", dot: true },

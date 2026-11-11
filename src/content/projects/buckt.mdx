@@ -1,0 +1,57 @@
+---
+title: Buckt — Cycle-Based Budgeting App
+description: A React Native + Firebase envelope-budgeting app that runs on your pay cycle — income goes into budgets, commitments are set aside automatically, and leftover money is never silently lost.
+date: 2026-04-01
+info:
+  - text: "React Native · Expo · Firebase (Auth, Firestore, Storage)"
+    icon:
+      type: lucide
+      name: layers
+  - text: "v1.0.0 live on Google Play"
+    icon:
+      type: lucide
+      name: rocket
+  - text: "Android & iOS"
+    icon:
+      type: lucide
+      name: smartphone
+problem: "Monthly budgeting apps track calendar months, but money arrives on payday — and regular commitments quietly eat what looks like free cash."
+built: "An envelope-budgeting app built around the pay cycle, with commitments set aside automatically and unallocated money always visible."
+result: "Shipped to Google Play (v1.0.0); offline-first with per-user secured cloud sync."
+---
+
+## The Problem
+
+Most budgeting apps think in calendar months. Real money doesn't — it arrives on payday, and a chunk of it is already spoken for by commitments like rent, subscriptions and yearly fees. The result is a balance that looks spendable but isn't.
+
+## The Solution
+
+Buckt is envelope budgeting built around **your pay cycle**. Income is split into named budgets, commitments are set aside automatically at the start of each cycle, and whatever is left over is surfaced as unallocated money instead of disappearing.
+
+## Features
+
+- **Pay-cycle budgeting** — the cycle runs from your payday, not the 1st of the month
+- **Budgets** with health-coloured progress bars (healthy / under 30% left / under 10% left)
+- **Commitments** — monthly or yearly, with an automatic monthly equivalent, paid/pending status per cycle and payment history
+- **Three balance views** — Remaining, Spendable and In Budgets — so "money left" and "money free to spend" are never confused
+- **Carry forward or reset** unused budget, per budget
+- **Cycle history** snapshots that feed the Insights tab
+- **7-step onboarding** with plain-language hints for every budgeting term
+
+## Stack
+
+- **App**: React Native (Expo), TypeScript
+- **Auth**: Firebase Auth — email/password and Google sign-in
+- **Data**: Firestore through `react-native-firebase` for real offline persistence
+- **Storage**: Firebase Storage for receipt photos, private per user
+- **Environments**: separate Firebase projects for development and production
+
+## Key Challenges
+
+- **Offline that actually works.** The Firebase JS SDK persists through IndexedDB, which doesn't survive restarts in React Native. Migrated to the native `react-native-firebase` SDK to get real on-device persistence.
+- **Cycle transitions.** Rolling budgets over, snapshotting history and catching up on missed cycles has to be correct for every user on their first open — a regression here was found in production, fixed and re-shipped.
+- **Security by default.** Every Firestore and Storage path is scoped to the signed-in user's UID, including a collection-group rule for payment history.
+
+## Links
+
+- [Privacy policy](/portfolio/legal/buckt)

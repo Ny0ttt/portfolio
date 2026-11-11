@@ -1,0 +1,63 @@
+---
+title: DaVinci Resolve Linux Automation
+description: An open-source pipeline that turns a long gaming VOD into an editable DaVinci Resolve project — transcript, captions, a scored rough cut and a vertical Short — on the free edition, with no scripting API.
+date: 2026-10-01
+info:
+  - text: "Python · whisper.cpp · ffmpeg · FCPXML / OTIO / DRT"
+    icon:
+      type: lucide
+      name: layers
+  - text: "Open source — MIT, v0.2.0"
+    icon:
+      type: lucide
+      name: github
+  - text: "Linux · Resolve 21 free edition"
+    icon:
+      type: lucide
+      name: monitor
+problem: "Resolve's scripting API is Studio-only, so on the free edition every caption, cut and layout is done by hand."
+built: "A staged pipeline that writes Resolve's own interchange formats — FCPXML, OTIO and .drt timelines plus SRT — so the project opens ready to edit."
+result: "Open-sourced as v0.2.0: transcribe, align, score and export a VOD without opening Resolve or paying for Studio."
+---
+
+## The Problem
+
+DaVinci Resolve's scripting API only exists in the paid Studio edition. On the free edition — and on Linux — turning a multi-hour stream into an edit means placing every caption, cut and layout by hand.
+
+## The Approach
+
+Go around the API instead of through it. Resolve already **imports** timelines, so the pipeline writes the formats Resolve reads natively and leaves the creative pass to a human. Nothing is rendered or burned in — you import the files and keep editing normally.
+
+```
+VOD link + time range
+   │
+   ├─ transcribe  (whisper.cpp, word-level)
+   ├─ align       (DTW word starts + VAD-trimmed ends)
+   ├─ review      (optional by-ear fixes)
+   ├─ score       (loudness / emotion spikes → highlight candidates)
+   │
+   ▼
+timeline_normal.fcpxml · timeline_short.fcpxml · captions.srt
+```
+
+## Features
+
+- **Word-level transcription** with whisper.cpp, then alignment so captions land on the word
+- **Highlight scoring** from loudness and emotion spikes to propose a rough cut
+- **Two layouts** — a normal timeline and a stacked vertical Short
+- **Animated captions** written as Resolve's own `.drt` timeline format, each word chunk popping in
+- **Preflight** that names any missing tool or path and refuses before a run starts
+- **CI smoke suite** proving every module imports, every CLI responds and the docs agree with the code
+
+## Stack
+
+- **Language**: Python 3.12 (numpy, scipy, librosa for audio signals)
+- **Transcription**: whisper.cpp, built from source
+- **Media**: ffmpeg / ffprobe
+- **Output**: FCPXML, OpenTimelineIO, Resolve `.drt`, SRT
+
+## Key Challenges
+
+- **Reverse engineering Resolve's formats.** With no API, every output had to match what Resolve actually accepts on import — including its native `.drt` timeline format, built from exported templates.
+- **Caption timing that feels right.** Raw whisper timestamps drift; word starts are aligned with DTW and ends trimmed with voice-activity detection.
+- **Honest testing.** The public CI suite proves consistency, not output quality — quality is validated against real footage before each release, and the README says so.

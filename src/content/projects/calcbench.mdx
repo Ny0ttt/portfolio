@@ -1,0 +1,63 @@
+---
+title: Calcbench — How AI Agents Call Your App
+description: A TypeScript benchmark that measures how an AI agent (Claude Code over MCP) invokes an app's own logic — stdio MCP vs HTTP MCP vs a plain HTTP API, with a dataset the model provably cannot guess.
+date: 2026-11-01
+info:
+  - text: "TypeScript · Node · MCP (stdio + HTTP) · Claude Code"
+    icon:
+      type: lucide
+      name: layers
+  - text: "3 routes, 40/40 accuracy each"
+    icon:
+      type: lucide
+      name: check-circle
+  - text: "Benchmark / research build"
+    icon:
+      type: lucide
+      name: flask-conical
+problem: "When an AI agent answers a question about your app, you can't tell whether it called your code or just guessed — and nobody measures what each transport costs."
+built: "One pure logic package behind three routes (stdio MCP, HTTP MCP, direct HTTP), a non-guessable test set, and a live demo UI."
+result: "All three routes 40/40; with tools off the model scored 0/18 on hidden-rule prompts — proof the answers came from real tool calls."
+---
+
+## The Question
+
+How does an external AI agent drive a desktop app's own business logic — and what does each way of connecting it actually cost?
+
+A calculator is the test subject because its logic is trivial and objectively checkable, which isolates the plumbing under test from any domain complexity.
+
+## The Hard Part: Proving the Tool Was Called
+
+A calculator is the one domain a language model can already do on its own, so a naive test proves nothing — a correct answer might come from the model, not the app. The tool surface is deliberately **non-guessable**:
+
+1. **State the model can't know** — a memory register and a running tape inside the app
+2. **Operations with hidden rules** — custom operations whose formula never appears in the tool description, so a correct answer is proof of invocation
+3. **Precision models fumble** — exact decimal division, 200-digit factorials
+
+To validate the dataset, the same prompts were run against the model **with tools disabled**. It scored **0/18 on the hidden-rule prompts** at both medium and extra effort — so the routes' 40/40 means real tool use.
+
+## Design
+
+**One logic, many hosts.** `calc-core` is a pure TypeScript package with zero platform dependencies, hosted identically by every route — so the benchmark compares transport only. Latency is measured with **no LLM in the loop**, because the model round-trip dominates end-to-end time and is identical across routes.
+
+## Results (p50, loopback, 200 samples)
+
+| Route | Accuracy | p50 | Cold start | Setup |
+|---|---|---|---|---|
+| Floor — direct function call, no AI | 40/40 | 0.0034 ms | – | none |
+| stdio MCP | 40/40 | 0.277 ms | 284 ms | one config entry per AI app |
+| HTTP MCP | 40/40 | 1.575 ms | 450 ms | run a server + one URL entry |
+| Direct HTTP, no MCP | 40/40 | 0.955 ms | 161 ms | run a server + custom glue per AI platform |
+
+**What each step costs:** leaving your own process adds ~0.27 ms; a network hop instead of a pipe adds ~1.3 ms; the MCP layer itself (both over HTTP) adds ~0.6 ms. All of it is noise next to an LLM round-trip — so the real trade-off is **setup and tool discovery**, not speed. MCP's standard tool discovery is what direct HTTP lacks.
+
+## Stack
+
+- **Language**: TypeScript throughout
+- **Servers**: Node — stdio MCP, HTTP MCP, and a direct HTTP baseline
+- **Client**: Claude Code as the MCP client
+- **Demo**: a live web UI that drives the same logic
+
+## What It's For
+
+The non-guessable tool-description pattern transfers directly to real apps: it's how I'd verify an AI agent is genuinely operating an app like [Buckt](/portfolio/projects/buckt) rather than improvising.
