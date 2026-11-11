@@ -45,5 +45,7 @@ Draft the three `.mdx` entries (frontmatter: title, description, date, info, pro
 **Revert**: delete the 3 `.mdx` files and restore the two `index.astro` lines.
 
 **Open (reminder owed to Ny0t)**
-- Add GitHub links to the resolve-oss and Calcbench entries, plus Buckt's (github / Play Store). Blocked on: push resolve-oss (3 commits ahead), create the Calcbench repo.
+- ~~resolve-oss link~~ — DONE 2026-11-11 (Ny0t pushed `973877f`; link added on the GitHub info row + a Links section).
+- ~~Calcbench link~~: DONE 2026-11-11. Repo prepped (private-data check clean, README, MIT, gitignore), Ny0t pushed `Ny0ttt/calcbench`, link added.
+- Buckt link (GitHub / Play Store): not added yet.
 - Confirm Buckt's Play Store listing name (the in-app name is "Salaryman").
