@@ -1,0 +1,40 @@
+---
+title: "Now I Know How Reverse Engineering Works"
+description: "I started learning Android reverse engineering by contributing to Morphe. My first patch run hit a real bug. I tracked down the cause, filed it, and found it had already been fixed."
+createdAt: 2026-11-17
+tags:
+  - reverse-engineering
+  - android
+---
+
+I wanted to learn Morphe because the tech hit my curiosity, which has always been what drives me. I never thought working on obfuscated code was really a thing. The class names are scrambled into things like `ajuj`, the methods are called `U`, and people still change what the app does. It amazed me, so I wanted to learn how it works.
+
+Morphe can't find code by name, because the names change every release. It uses **fingerprints** instead: a description of what a method looks like inside, like the strings it uses and the order of its instructions. If the description matches, that's the method to patch.
+
+## One patch failed
+
+I followed the patching guide in the repo for my first run, on YouTube 21.30.216. The guide runs the patcher with `--validate`, which checks that every patch still finds its code. One patch failed: Feed card layout.
+
+That felt weird. I was doing exactly what the guide said, so it should have just worked. Then it started to look like a real bug, and I got excited about submitting my first issue to an open-source project.
+
+## Ruling things out
+
+My first guess was that the method this patch looks for doesn't exist in this YouTube version. I checked the decompiled code, and it does: every piece the fingerprint describes is there, in order. So that guess was wrong.
+
+Next I ran the same patch without `--validate`, and Feed card layout applied with no errors. Then I tried the official stable release, v2.1.1, with `--validate`, and it failed again. So the problem only shows up in validate mode, and it's in the released tool, not just my build.
+
+## Finding the cause
+
+Patches run in alphabetical order. Before Feed card layout runs, an earlier patch adds a few lines of code inside the same method. In normal mode, Feed card layout reuses the match it found before anything changed. In validate mode, it searches again, this time in code that has already been changed. The extra lines break the pattern the fingerprint expects, so it no longer matches.
+
+To confirm it, I ran Feed card layout on its own with `--validate`. With no other patch touching the method first, it applied.
+
+## Already fixed
+
+I filed it as [issue #4882](https://github.com/MorpheApp/morphe-patches/issues/4882). It turned out someone had found the same thing a few days earlier. The fix, in PR #4663, loosened the fingerprint to allow a few extra instructions at that spot, because *"the engagement panel hook inserts its code before this instruction."* That's the same cause I found.
+
+My copy of the code was on the `main` branch, behind the newer `dev` branch where the fix already was. So my issue was closed as already fixed, but my diagnosis matched the real one.
+
+## What's next
+
+Then I kept learning. I'm now working on my first patch of my own: figuring out how YouTube decides when to open the popup panels in its player.
