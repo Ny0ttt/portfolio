@@ -31,6 +31,24 @@ How does an external AI agent drive a desktop app's own business logic — and w
 
 A calculator is the test subject because its logic is trivial and objectively checkable, which isolates the plumbing under test from any domain complexity.
 
+## Demo Video
+
+<video
+  controls
+  muted
+  playsinline
+  preload="metadata"
+  poster="/portfolio/video/calcbench-demo.jpg"
+  width="1280"
+  height="590"
+  aria-label="Claude Code operating the Calcbench calculator over HTTP MCP"
+>
+  <source src="/portfolio/video/calcbench-demo.webm" type="video/webm" />
+  <source src="/portfolio/video/calcbench-demo.mp4" type="video/mp4" />
+</video>
+
+Claude Code (left) operating the live calculator over HTTP MCP. Every 🤖 line in the activity feed is a real tool call landing in the app — including `ny0tadd`, whose rule Claude can't see.
+
 ## The Hard Part: Proving the Tool Was Called
 
 A calculator is the one domain a language model can already do on its own, so a naive test proves nothing — a correct answer might come from the model, not the app. The tool surface is deliberately **non-guessable**:
