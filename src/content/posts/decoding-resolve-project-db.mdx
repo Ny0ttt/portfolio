@@ -1,8 +1,7 @@
 ---
 title: "Decoding DaVinci Resolve's Project.db"
-description: "[Standfirst in your words: Resolve's scripting API is Studio-only, so you went around it.]"
-createdAt: 2026-11-10
-draft: true
+description: "Resolve's scripting API is Studio-only. Out of curiosity, I went around it: I decoded the free edition's own project database to automate the repetitive parts of how I edit."
+createdAt: 2026-11-17
 tags:
   - reverse-engineering
   - resolve
@@ -10,39 +9,92 @@ tags:
 
 import Note from "../../components/Note.astro";
 
-{/*
-  OUTLINE ONLY — assembled from video-01-beat-sheet.md. Every [bracket] is yours to write.
-  Same rule as the video: no claim that hasn't been run, every number shown with its output.
-  Remove `draft: true` above when it's ready; until then it only shows in `pnpm dev`.
-*/}
-
-[Opening paragraph: the wall. Resolve has a scripting API, it's Studio-only, and on the free edition `fusionscript` doesn't load at all. You wanted it on Linux, on free Resolve, and weren't paying to find out whether it would work.]
+I didn't go around it to avoid paying for a good product. I went around it because I was curious how far today's tools could take me, on the free edition, on Linux. And I had a real job for it: the repetitive part of how I edit. Find the highlights, transcribe them, and sort the highlighted parts onto their own video track, the same way I'd do it by hand. What I wanted at the end wasn't a rendered video. It was a timeline I could open, keep editing, and stay in control of the output.
 
 ## The wall
 
-[What exactly is blocked, and where Blackmagic documents the thing you can't call.]
+On the free edition, the scripting API is documented and the module loads, but there's nothing on the other end. With Resolve 21.1.1 open on my machine:
 
-## Doors that failed
+```bash
+$ python3 -c "import DaVinciResolveScript as d; print(d.scriptapp('Resolve'))"
+None
+```
 
-[The wrong turns, in order. Don't cut this. It's the part that shows a person did the work.]
+No connection, and nothing listening on port 1144, where Studio's scripting server sits. Without that connection there's no programmatic way to build a timeline. That's the wall.
+
+## Doors I tried
+
+With no API to call, the only way in was a file Resolve would import on its own. I tried four, and they opened by different amounts.
 
 <Note label="Dead end">
-[One door that looked promising and why it closed.]
+**An MCP bridge.** There's an existing project, `davinci-resolve-mcp`, that lets an AI agent drive Resolve. It's documented as a tool for DaVinci Resolve Studio, and it sits on the same scripting API, so on the free edition it was never going to connect.
 </Note>
+
+**OTIO.** OpenTimelineIO is an open timeline format, and free Resolve imports it. It's good for cuts only, though: it has no subtitle track type and no transform that Resolve honours. Fine for the rough cut, useless for anything that has to look right.
+
+**FCPXML.** This was the first output from my tool that actually worked. Layout comes through: position, scale and crop land where I put them. Animation doesn't. Resolve keeps only the first keyframe on a title and drops the rest, even when the file is Resolve's own export imported straight back in. Keyframe timing is the rough spot I still want to automate.
+
+**`.drt`.** Resolve's own timeline format, and the smoothest result. It's undocumented, so I didn't write it from a spec. I built a sample animation in Resolve, exported the timeline, and learned from what came out. Every `.drt` my tool writes starts from a real Resolve export, so the structure around my changes is known to be good.
 
 ## Opening Project.db
 
-[Premise → method → discovery → the trap.]
+Free Resolve can't be scripted, but it still has to save your project somewhere. That somewhere is a SQLite file, `Project.db`, and it opens with any SQLite tool. The tables are readable; `Sm2TiItem` holds the timeline items.
+
+The Inspector transform, the zoom and position I set by hand, lives in one column, `Sm2TiItem.EffectFiltersBA`, and it's binary: a small header, then zstd (find the magic bytes `28 b5 2f fd` and decompress from there), then protobuf.
+
+Protobuf fields are numbered, not named, so nothing in the file says which number is zoom. This was the slow, painful part: change one slider in the Inspector, save, diff the blob, see which field moved. Then again, one slider at a time, until the map was complete. Zoom is field 42, Zoom Y is 43, Position X is 40, Position Y is 41. Position is stored as a fraction of the timeline rather than in pixels, so the reader converts it back.
+
+I didn't expect any of it to be easy to understand. I'd committed to the grind for the output I wanted.
+
+<Note label="Trap">
+A parameter left at its default isn't stored at all. A missing field means "default", not zero. Code that reads missing as zero is wrong only on clips nobody touched, which makes it easy to miss.
+</Note>
+
+Anything in that filter I hadn't measured is returned as `"unknown"` instead of being guessed at. Reading back a hand-tweaked project:
 
 ```bash
-# [real command you ran]
-# [real output]
+$ venv/bin/python src/resolve_read.py --db ".../New Project 7/Project.db"
+"width": 1080, "height": 1920,
+"webcam":   { "zoom": 0.99, "x": 0.0, "y": 1654.0 },
+"gameplay": { "zoom": 2.31, "x": 0.0, "y": -828.57 }
 ```
+
+## Making captions move
+
+Layout was only half of it. I wanted captions that pop in on each word, the way I'd animate them by hand. FCPXML couldn't carry that, so the animation had to go through Resolve's own `.drt` format.
+
+A `.drt` is a zip of XML plus binary blobs, the same kind of blob as in `Project.db`. So I used the same method: animate one caption by hand in Resolve, export the timeline, and read what came out. The zoom keyframes are stored as a list, with a frame number and a value for each key.
+
+The frame number was the part that mattered. It isn't a position on the timeline. It's counted from **the caption's own first frame**. That's the anchor: each caption carries its own animation, timed from its own start. Reading back the template I exported from Resolve:
+
+```bash
+caption starts at timeline frame 34
+  key: frame   0 (from the caption's own start)  zoom 0.89
+  key: frame  10 (from the caption's own start)  zoom 1.21
+  key: frame  20 (from the caption's own start)  zoom 1.00
+```
+
+Once I knew that, placing the pop on every caption was the easy part: the same three keys, written into each caption, wherever it lands on the timeline. The writer's output matches Resolve's own exports byte for byte, and free Resolve 21.1.1 imports it.
 
 ## Making the import work
 
-[The relink, and what a fresh clone needs to reproduce it.]
+In the end, all of this runs as one command. With the public-domain sample that's in the repo:
+
+```bash
+venv/bin/python src/run_pipeline.py new \
+  --clip samples/jfk.mp4 --game example --streamer example --name jfkdemo
+```
+
+Then I import `projects/jfkdemo/timeline_normal_v1.fcpxml` into Resolve, the same way I'd import any timeline.
+
+Free Resolve on Linux can't decode H.264 or AAC, so it won't read a normal `.mp4`. The pipeline writes a `.mov` next to each clip in a format it can read, and I relink to `clip_edit_v1.mov` instead of the original. After that I drag `captions_final_v1.srt` onto a subtitle track and press play. The cuts land where I'd have put them, and the captions sit on the words.
+
+It's not a finished video, and it isn't meant to be. It's a timeline I can open and keep editing, which is what I wanted from the start.
 
 ## What I'd do next
 
-[Close. Link the repo and the video once they're public.]
+It works, but it still has some rough spots. Keyframe timing is the main one. The caption pop works through `.drt`, but anything more than that, like zooms that follow the action, I still set by hand. That's the next thing I want to automate, using the same approach: build it once in Resolve, export it, and read what comes out.
+
+The `.drt` templates are also 60 fps exports, so animated captions only work on 60 fps footage for now. Anything else falls back to the FCPXML timeline.
+
+The code is on GitHub: [davinci-resolve-linux-automation](https://github.com/Ny0ttt/davinci-resolve-linux-automation).
